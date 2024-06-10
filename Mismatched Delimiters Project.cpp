@@ -34,6 +34,7 @@ Left delimiter [ at line 7, char 3 had no right delimiter.
 Left delimiter { at line 3, char 20 had no right delimiter.*/
 
 #include<iostream>
+#include <string>
 using namespace std;
 
 class DelimiterStack {
@@ -42,18 +43,77 @@ private:
 		char character;
 		int lineNumber;
 		int charCount;
+		DelimiterNode* next;
+		//Constructor
+		DelimiterNode(char ch, int lineNum, int chCount, DelimiterNode* next1 = NULL)
+		{
+			character = ch;
+			lineNumber = lineNum;
+			charCount = chCount;
+			next = next1;
+		}
 	};
 	// Define stack top
+	DelimiterNode* top;
 public:
 	//Constructor
-
+	DelimiterStack() { top = nullptr; }
 	//Destructor
-
+	~DelimiterStack();
 	//Stack Operations
 	void push(char, int, int);
-	void popDelimiter(char&, int&, int&); // reference variables because three variables cannot be returned through return statement
-	bool isEmpty();
+	// reference variables because three variables cannot be returned through return statement
+	void popDelimiter(char&, int&, int&); 
+	bool isEmpty() const;
+	//Stack Exception
+	class Underflow {};
 };
+
+void DelimiterStack::push(char ch, int lineNum, int chCount)
+{
+	try
+	{
+		top = new DelimiterNode(ch, lineNum, chCount, top);
+	}
+	catch (bad_alloc& ba)
+	{
+		cout << "Memory allocation error: " << ba.what() << endl;
+		exit(1);
+	}
+}
+
+void DelimiterStack::popDelimiter(char& ch, int& lineNum, int& chCount)
+{
+	DelimiterNode* temp;
+
+	if (isEmpty()) { throw DelimiterStack::Underflow(); }
+	else
+	{
+		ch = top->character;
+		lineNum = top->lineNumber;
+		chCount = top->charCount;
+		temp = top;
+		top = top->next;
+		delete temp;
+	}
+}
+
+bool DelimiterStack::isEmpty() const
+{
+	return top == nullptr;
+}
+
+DelimiterStack::~DelimiterStack()
+{
+	DelimiterNode* garbage = top;
+	while (garbage != nullptr)
+	{
+		top = top->next;
+		garbage->next = nullptr;
+		delete garbage;
+		garbage = top;
+	}
+}
 
 int main()
 {
