@@ -65,9 +65,87 @@ public:
 	// reference variables because three variables cannot be returned through return statement
 	void popDelimiter(char&, int&, int&); 
 	bool isEmpty() const;
+	char topValue() const
+	{
+		if (isEmpty())
+			return ' ';
+		else
+			return top->character;
+	}
+	void check(string, int, int&);
 	//Stack Exception
 	class Underflow {};
 };
+
+void DelimiterStack::check(string input, int lineNum, int& chCount)
+{
+	char ch;
+	int poppedLineNum = 0, poppedChCount = 0;
+
+	for (int i = 0; i < input.size(); i++)
+	{
+		chCount++;
+		if (input[i] == '(' || input[i] == '[' || input[i] == '{')
+			push(input[i],lineNum,i + 1);
+		else if (input[i] == ')')
+		{
+			if (topValue() == '(')
+				popDelimiter(ch, poppedLineNum,poppedChCount);
+			else if (topValue() == ' ')
+			{
+				cout << "Right delimiter " << input[i] << " had no "
+					<< " left delimiter found at line " << lineNum
+					<< ", char " << i + 1 << endl;
+			}
+			else
+			{
+				cout << "Mismatched delimiter " << top->character
+					<< " found at line " << top->lineNumber << ", char "
+					<< top->charCount << " does not match "
+					<< input[i] << " found at line " << lineNum << ", char "
+					<< i + 1 << endl;
+			}
+		}
+		else if (input[i] == ']')
+		{
+			if (topValue() == '[')
+				popDelimiter(ch, poppedLineNum, poppedChCount);
+			else if (topValue() == ' ')
+			{
+				cout << "Right delimiter " << input[i] << " had no "
+					<< " left delimiter found at line " << lineNum
+					<< ", char " << i + 1 << endl;
+			}
+			else
+			{
+				cout << "Mismatched delimiter " << top->character
+					<< " found at line " << top->lineNumber << ", char "
+					<< top->charCount << " does not match "
+					<< input[i] << " found at line " << lineNum << ", char "
+					<< i + 1 << endl;
+			}
+		}
+		else if (input[i] == '}')
+		{
+			if (topValue() == '{')
+				popDelimiter(ch, poppedLineNum, poppedChCount);
+			else if (topValue() == ' ')
+			{
+				cout << "Right delimiter " << input[i] << " had no "
+					<< " left delimiter found at line " << lineNum
+					<< ", char " << i + 1 << endl;
+			}
+			else
+			{
+				cout << "Mismatched delimiter " << top->character
+					<< " found at line " << top->lineNumber << ", char "
+					<< top->charCount << " does not match "
+					<< input[i] << " found at line " << lineNum << ", char "
+					<< i + 1 << endl;
+			}
+		}
+	}
+}
 
 void DelimiterStack::push(char ch, int lineNum, int chCount)
 {
@@ -118,25 +196,33 @@ DelimiterStack::~DelimiterStack()
 int main()
 {
 	// variable declarations and initializations
-
 	DelimiterStack mydelistack;
-
 	string currentLine = "";
-	//do 
-	//{
-		// parse the input line ignore non delimiters
+	int numOfLines = 0, charCount = 0;
 
-		// if an opening delimiter, push
+	do 
+	{
+		cout << "Enter lines of text and the program "
+			<< "will test for mismatched delimiters:";
+		getline(cin, currentLine);
+		if (currentLine != "DONE")
+		{
+			mydelistack.check(currentLine, ++numOfLines, charCount);
+			charCount = 0;
+		}
+	} while (currentLine != "DONE");
+	if (!mydelistack.isEmpty())
+	{
+		char ch;
+		int poppedLineNum = 0, poppedChCount = 0;
 
-		// if a closing delimiter, pop 
-
-		// check if any error needs to be thrown
-
-		// rest of your logic
-
-	//} while (currentLine is not equal to "DONE");
-
-	// rest of the logic
+		while (!mydelistack.isEmpty())
+		{
+			mydelistack.popDelimiter(ch, poppedLineNum, poppedChCount);
+			cout << "Left delimiter " << ch << " at line " << poppedLineNum
+				<< ", char " << poppedChCount << " had no right delimiter.\n";
+		}
+	}
 
 	return 0;
 }
